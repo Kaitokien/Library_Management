@@ -16,7 +16,7 @@ export class CreateUserDto {
   password: string;
 
   @IsOptional()
-  @IsEnum(['ADMIN', 'USER'], {
+  @IsEnum(['ADMIN', 'USER', 'EMPLOYEE'], {
     message: 'Valid role required',
   })
   role?: UserRole;

@@ -3,6 +3,7 @@ import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 export enum UserRole {
   ADMIN = 'ADMIN',
   USER = 'USER',
+  EMPLOYEE = 'EMPLOYEE'
 }
 
 @Entity()
@@ -22,6 +23,7 @@ export class Users {
   @Column({
     type: 'enum',
     enum: UserRole,
+    enumName: 'libray_role',
     default: UserRole.USER
   })
   role: UserRole

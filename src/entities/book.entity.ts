@@ -1,6 +1,7 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { IsDate, IsInt, IsNotEmpty, IsString } from 'class-validator'
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { IsDate, IsInt, IsNotEmpty, IsNumber, IsString } from 'class-validator'
 import { Category } from "src/entities/category.entity";
+import { RentalBook } from "./rental_book.entity";
 
 @Entity()
 export class Books {
@@ -34,4 +35,12 @@ export class Books {
   @IsDate()
   @Column({ type: 'date' })
   publisheddate: Date
+
+  @IsNotEmpty()
+  @IsNumber()
+  @Column()
+  stock: number
+
+  // @OneToMany(() => RentalBook, (rb) => rb.rental)
+  // rental_books: RentalBook[];
 }

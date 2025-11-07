@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Put, UseGuards, Query } from '@nestjs/common';
 import { BooksService } from 'src/services/books.service';
-import { CreateBookDto } from 'src/dtos/create-book.dto';
-import { UpdateBookDto } from 'src/dtos/update-book.dto';
+import { CreateBookDto } from 'src/dtos/books/create-book.dto';
+import { UpdateBookDto } from 'src/dtos/books/update-book.dto';
 import { Roles } from 'src/helpers/roles.decorator';
 import { UserRole } from 'src/entities/user.entity';
 import { AuthGuard } from '../guards/auth.guard';
@@ -16,7 +16,7 @@ export class BooksController {
     return this.booksService.findAll();
   }
 
-  @Get('/search')
+  @Get('/search') // [GET] books/search/query=''
   searchBook(
     @Query('query') query: string
   ) {
@@ -49,5 +49,11 @@ export class BooksController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.booksService.remove(+id);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('/rent')
+  rentBook() {
+
   }
 }

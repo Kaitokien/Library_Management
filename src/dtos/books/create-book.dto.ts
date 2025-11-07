@@ -20,4 +20,8 @@ export class CreateBookDto {
   @IsNotEmpty()
   @IsDateString()
   publisheddate: string
+
+  @IsNotEmpty()
+  @IsNumber()
+  stock: number
 }

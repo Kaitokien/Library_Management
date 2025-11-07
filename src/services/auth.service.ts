@@ -1,10 +1,10 @@
 import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateUserDto } from 'src/dtos/create-user.dto';
+import { CreateUserDto } from 'src/dtos/users/create-user.dto';
 import { Users } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt'
-import { LoginDto } from 'src/dtos/login-user.dto';
+import { LoginDto } from 'src/dtos/users/login-user.dto';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -28,6 +28,11 @@ export class AuthService {
     if(existingUser) {
       throw new ConflictException('Email or username already exists');
     }
+    if(createUserDto.role === 'EMPLOYEE') {
+      return {
+        message: "You are not authorized to create an Employee. Please contact the Admin for details!"
+      }
+    }
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     const new_user = this.userRepository.create({
       ...createUserDto,
@@ -39,7 +44,6 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    console.log(loginDto)
     const email = loginDto.email;
     const password = loginDto.password;
     
@@ -50,7 +54,9 @@ export class AuthService {
     const isValid = await bcrypt.compare(password, user.password);
 
     if (!isValid) {
-      throw new UnauthorizedException();
+      return {
+        message: "Sai email hoac mat khau!"
+      }
     }
 
     const payload = { 
@@ -61,6 +67,29 @@ export class AuthService {
     };
     return {
       access_token: await this.jwtService.signAsync(payload)
+    }
+  }
+
+  async createEmployee(createEmployee: CreateUserDto) {
+    const existingUser = await this.findOneByEmail(createEmployee.email);
+    
+    if(existingUser) {
+      throw new ConflictException('Email or username already exists');
+    }
+    if(createEmployee.role !== 'EMPLOYEE') {
+      return {
+        message: 'Please create an Employee!'
+      }
+    }
+    const hashedPassword = await bcrypt.hash(createEmployee.password, 10);
+    const new_user = this.userRepository.create({
+      ...createEmployee,
+      password: hashedPassword,
+    })
+    
+    await this.userRepository.save(new_user);
+    return {
+      message: "Employee created successfully!"
     }
   }
 }
