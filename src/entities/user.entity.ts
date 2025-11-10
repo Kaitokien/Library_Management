@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Rental } from "./rental.entity";
 
 export enum UserRole {
   ADMIN = 'ADMIN',
@@ -23,8 +24,11 @@ export class Users {
   @Column({
     type: 'enum',
     enum: UserRole,
-    enumName: 'libray_role',
+    enumName: 'library_role',
     default: UserRole.USER
   })
   role: UserRole
+
+  @OneToMany(() => Rental, (rental) => rental.user)
+  rentals: Rental[]
 }

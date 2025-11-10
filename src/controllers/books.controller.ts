@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, UseGuards, Query, Req } from '@nestjs/common';
 import { BooksService } from 'src/services/books.service';
 import { CreateBookDto } from 'src/dtos/books/create-book.dto';
 import { UpdateBookDto } from 'src/dtos/books/update-book.dto';
@@ -51,9 +51,10 @@ export class BooksController {
     return this.booksService.remove(+id);
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.USER)
   @Post('/rent')
-  rentBook() {
-
+  rentBook(@Req() req) {
+    // return this.booksService.rentBook(req.user.sub);
   }
 }

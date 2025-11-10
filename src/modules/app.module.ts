@@ -9,6 +9,8 @@ import { Books } from '../entities/book.entity';
 import { Category } from '../entities/category.entity';
 import { MembershipModule } from './membership.module';
 import { Membership } from 'src/entities/membership.entity';
+import { Rental } from 'src/entities/rental.entity';
+import { RentalBook } from 'src/entities/rental_book.entity';
 
 @Module({
   imports: [
@@ -18,7 +20,7 @@ import { Membership } from 'src/entities/membership.entity';
       port: 5432,
       password: '123',
       username: 'postgres',
-      entities: [Users, Books, Category, Membership],
+      entities: [Users, Books, Category, Membership, Rental, RentalBook],
       database: 'Library_DB',
       synchronize: false,
       logging: true,

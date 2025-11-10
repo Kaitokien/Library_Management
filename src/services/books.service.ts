@@ -3,12 +3,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateBookDto } from 'src/dtos/books/create-book.dto';
 import { UpdateBookDto } from 'src/dtos/books/update-book.dto';
 import { Books } from 'src/entities/book.entity';
-import { Repository } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
 
 @Injectable()
 export class BooksService {
   constructor(
-    @InjectRepository(Books) private bookRepository: Repository<Books>
+    @InjectRepository(Books) private bookRepository: Repository<Books>,
+    private dataSource: DataSource
   ) {}
   async create(createBookDto: CreateBookDto[]) {
     try {
@@ -97,5 +98,31 @@ export class BooksService {
       .orWhere('books.author ILIKE :query', { query: `%${query}%` })
       .getMany();
     return result;
+  }
+
+  async rentBook() {
+    
+  }
+
+  /* 
+  Ham kiem tra xem user co hoi vien không, nếu có thì kiểm tra trong danh
+  sách các lần đăng ký hội viên thì có lần đăng ký nào còn trong thời hạn hay không
+   */
+  private async hasMembership(userId: number, transactionalEntityManager) {
+    const latestMembership = await transactionalEntityManager
+      .createQueryBuilder('membership')
+      .where('membership.id_user = :userId', { userId })
+      .orderBy('membership.end_date', 'DESC')
+      .getOne();
+
+    if (!latestMembership) {
+      return false;
+    }
+
+    // Check if membership is still valid
+    const now = new Date();
+    const endDate = new Date(latestMembership.end_date);
+
+    return endDate >= now; 
   }
 }
