@@ -6,6 +6,7 @@ import { Roles } from 'src/helpers/roles.decorator';
 import { UserRole } from 'src/entities/user.entity';
 import { AuthGuard } from '../guards/auth.guard';
 import { RolesGuard } from 'src/guards/role.guard';
+import { CreateRentalDto } from 'src/dtos/rental/create-rental.dto';
 
 @Controller('books')
 export class BooksController {
@@ -54,7 +55,8 @@ export class BooksController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.USER)
   @Post('/rent')
-  rentBook(@Req() req) {
-    // return this.booksService.rentBook(req.user.sub);
+  rentBook(@Req() req, @Body() createRentalDto: CreateRentalDto) {
+    // console.log(req.user.sub);
+    return this.booksService.rentBook(req.user.sub, createRentalDto);
   }
 }

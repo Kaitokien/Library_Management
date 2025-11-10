@@ -41,6 +41,6 @@ export class Books {
   @Column()
   stock: number
 
-  // @OneToMany(() => RentalBook, (rb) => rb.book)
-  // rental_books: RentalBook[];
+  @OneToMany(() => RentalBook, (rb) => rb.book)
+  rental_books: RentalBook[];
 }
