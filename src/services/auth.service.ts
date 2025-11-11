@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt'
 import { LoginDto } from 'src/dtos/users/login-user.dto';
 import { JwtService } from '@nestjs/jwt';
+import { ApiTags } from '@nestjs/swagger';
 
 @Injectable()
 export class AuthService {
@@ -41,6 +42,14 @@ export class AuthService {
     
     await this.userRepository.save(new_user);
     console.log('Created new user successfully')
+    return {
+    message: 'User registered successfully',
+    user: {
+      id: new_user.id,
+      email: new_user.email,
+      role: new_user.role,
+    },
+  };
   }
 
   async login(loginDto: LoginDto) {
@@ -66,6 +75,7 @@ export class AuthService {
       role: user.role
     };
     return {
+      message: 'Login successfully',
       access_token: await this.jwtService.signAsync(payload)
     }
   }

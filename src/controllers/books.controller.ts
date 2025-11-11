@@ -7,16 +7,19 @@ import { UserRole } from 'src/entities/user.entity';
 import { AuthGuard } from '../guards/auth.guard';
 import { RolesGuard } from 'src/guards/role.guard';
 import { CreateRentalDto } from 'src/dtos/rental/create-rental.dto';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
 @Controller('books')
 export class BooksController {
   constructor(private readonly booksService: BooksService) {}
 
+  @ApiOperation({ summary: 'API để xem danh sách các sách' })
   @Get() // [GET] /books
   findAll() {
     return this.booksService.findAll();
   }
 
+  @ApiOperation({ summary: 'API để tìm sách' })
   @Get('/search') // [GET] books/search/query=''
   searchBook(
     @Query('query') query: string
@@ -24,11 +27,14 @@ export class BooksController {
     return this.booksService.searchBook(query);
   }
 
+  @ApiOperation({ summary: 'API để tìm sách theo ID' })
   @Get(':id') // [GET] /books/:id
   findOne(@Param('id') id: string) {
     return this.booksService.findOne(+id);
   }
 
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'API để tạo sách mới (Chỉ ADMIN)' })
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @Post() // [POST] /books
@@ -37,6 +43,8 @@ export class BooksController {
     return this.booksService.create(createBookDto);
   }
 
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'API để cập nhật thông tin sách (Chỉ ADMIN)' })
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @Put(':id') // [PUT] /books/:id
@@ -45,6 +53,8 @@ export class BooksController {
     return this.booksService.update(+id, updateBookDto);
   }
 
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'API để xóa sách (Chỉ ADMIN)' })
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @Delete(':id')
@@ -52,6 +62,8 @@ export class BooksController {
     return this.booksService.remove(+id);
   }
 
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'API để mượn sách (Chỉ người dùng)' })
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.USER)
   @Post('/rent')

@@ -3,22 +3,21 @@ import { UsersService } from '../services/users.service';
 import { CreateUserDto } from 'src/dtos/users/create-user.dto';
 import { UpdateUserDto } from 'src/dtos/users/update-user.dto';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
-  }
-
+  @ApiOperation({ summary: 'API để người dùng xem thông tin tài khoản' })
   @UseGuards(AuthGuard)
   @Get('/profile')
   getProfile(@Req() req) {
     return this.usersService.findOne(req.user.sub)
   }
 
+  @ApiOperation({ summary: 'API để người dùng chỉnh sửa thông tin tài khoản' })
   @UseGuards(AuthGuard)
   @Put('profile')
   updateProfile(@Req() req, @Body() updateUserDto: UpdateUserDto) {
