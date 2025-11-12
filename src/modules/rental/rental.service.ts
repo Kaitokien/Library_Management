@@ -190,12 +190,13 @@ export class RentalService {
 
       // Update rentalbook status
       rental_book.status = RentalBookStatus.BORROWED;
+      console.log('Before',rental.revenue)
       await manager.save(RentalBook, rental_book);
       if(rental.discount > 0) {
         rental.revenue += totalBookRevenue * (1 - rental.discount / 100)
       }
       else rental.revenue += totalBookRevenue
-
+      console.log('After',rental.revenue)
       //  Check if all rentalBooks are returned
     const checkRentalBookStatus = rental.rental_books.every(
       rb => rb.status === RentalBookStatus.RETURNED || rb.status === RentalBookStatus.CANCELLED || rb.id === rental_book.id
@@ -374,20 +375,20 @@ export class RentalService {
       // Check if the returned date is later than the due date and calculate penalty
       const dueDate = new Date(rental_book.due_date);
       const returnDate = new Date();
-      let penalty = 0;
+      let penalty = rental.penalty;
       if (returnDate > dueDate) {
         const daysLate = Math.ceil(
           (returnDate.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24)
         );
         const penaltyPerDay = 10000;
-        penalty = daysLate * penaltyPerDay;
+        penalty += daysLate * penaltyPerDay;
       }
       
       //  Check if all rentalBooks are returned or cancelled
       const checkRentalBookStatus = rental.rental_books.every(
         rb => rb.status === RentalBookStatus.RETURNED || rb.status === RentalBookStatus.CANCELLED
       );
-      if (checkRentalBookStatus) 
+      if (checkRentalBookStatus && penalty === 0) 
         rental.status = RentalStatus.ACCEPTED;
       else 
         rental.status = RentalStatus.PENDING;
@@ -416,6 +417,30 @@ export class RentalService {
         },
         rentalStatus: rental.status,
       };
+    })
+  }
+
+  async confirmPenaltyPayment(userId: number, id_rental: number) {
+    return await this.datasource.transaction(async manager => {
+      const user = await this.findUser(userId);
+      if (!user) throw new NotFoundException('User not found');
+
+      // Kiem tra xem nguoi dung co rental nao hay khong
+      const rental = await this.findRental(manager, id_rental, userId);
+      
+      if(!rental) throw new NotFoundException('No rental found');
+
+      rental.revenue += rental.penalty;
+      rental.penalty = 0;
+      
+      const checkRentalBookStatus = rental.rental_books.every(
+        rb => rb.status === RentalBookStatus.RETURNED || rb.status === RentalBookStatus.CANCELLED
+      );
+      if (checkRentalBookStatus) 
+        rental.status = RentalStatus.ACCEPTED;
+      else 
+        rental.status = RentalStatus.PENDING;
+      await manager.save(Rental, rental);
     })
   }
 }

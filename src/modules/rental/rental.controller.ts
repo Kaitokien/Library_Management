@@ -16,7 +16,7 @@ export class RentalController {
   constructor(private rentalBookService: RentalService) {}
 
   // Tra ve danh sach cac rental di kem voi rental book cua user
-  @Get(':userId/rental-list/')
+  @Get(':userId/rental-list')
   getRentalFromUser(
     /*@Body() updateRentalStatusDto: UpdateRentalBookStatusDto*/
     @Param('userId') userId: string
@@ -55,5 +55,11 @@ export class RentalController {
   }
 
   // Xac nhan thanh toan tien phat cho user
-  
+  @Post(':userId/rental-list/:id_rental/penalty-payment')
+  confirmPenaltyPayment(
+    @Param('userId') userId: string,
+    @Param('id_rental') id_rental: string,
+  ) {
+    return this.rentalBookService.confirmPenaltyPayment(+userId, +id_rental);
+  }
 }
