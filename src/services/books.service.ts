@@ -165,7 +165,7 @@ export class BooksService {
         user: user,
         status: RentalStatus.PENDING,
         discount: discountPercent,
-        revenue: 0, // Will be calculated when status changes to BORROWED
+        revenue: 0, 
         penalty: 0,
       });
 
@@ -182,7 +182,7 @@ export class BooksService {
           book: book,
           quantity: item.quantity,
           date_rented: item.date_rented,
-          price_per_day: 2000, // You can make this dynamic based on book category or other factors
+          price_per_day: 2000, 
           due_date: item.due_date,
           status: RentalBookStatus.PROGRESSING,
         });

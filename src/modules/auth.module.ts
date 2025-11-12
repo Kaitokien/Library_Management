@@ -13,7 +13,7 @@ import { AuthController } from '../controllers/auth.controller';
     JwtModule.register({
       global: true, // We don't need to import the JwtModule anywhere alse in our application
       secret: jwtConstants.secret,
-      signOptions: { expiresIn: '30m' },
+      signOptions: { expiresIn: '3h' },
     }),
     TypeOrmModule.forFeature([Users])
   ],

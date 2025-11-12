@@ -7,7 +7,7 @@ import { UserRole } from 'src/entities/user.entity';
 import { AuthGuard } from '../guards/auth.guard';
 import { RolesGuard } from 'src/guards/role.guard';
 import { CreateRentalDto } from 'src/dtos/rental/create-rental.dto';
-import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('books')
 export class BooksController {
@@ -64,6 +64,7 @@ export class BooksController {
 
   @ApiBearerAuth()
   @ApiOperation({ summary: 'API để mượn sách (Chỉ người dùng)' })
+  @ApiResponse({ status: 400, description: 'You have pending rentals. Please complete or cancel them before creating a new rental.' })
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.USER)
   @Post('/rent')

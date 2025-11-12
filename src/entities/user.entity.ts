@@ -1,5 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Rental } from "./rental.entity";
+import { Exclude } from "class-transformer";
 
 export enum UserRole {
   ADMIN = 'ADMIN',

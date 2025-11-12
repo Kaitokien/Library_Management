@@ -11,6 +11,7 @@ import { MembershipModule } from './membership.module';
 import { Membership } from 'src/entities/membership.entity';
 import { Rental } from 'src/entities/rental.entity';
 import { RentalBook } from 'src/entities/rental_book.entity';
+import { RentalModule } from './rental.module';
 
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import { RentalBook } from 'src/entities/rental_book.entity';
       synchronize: false,
       logging: true,
     }), 
-    AuthModule, UsersModule, BooksModule, CategoryModule, MembershipModule
+    AuthModule, UsersModule, BooksModule, CategoryModule, MembershipModule, RentalModule
   ],
   controllers: [],
   providers: [],
