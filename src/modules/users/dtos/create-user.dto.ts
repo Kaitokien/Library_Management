@@ -28,10 +28,10 @@ export class CreateUserDto {
   @IsString()
   password: string;
 
-  @ApiProperty({
-    required: false,
-    default: 'USER'
-  })
+  // @ApiProperty({
+  //   required: false,
+  //   default: 'USER'
+  // })
   @IsOptional()
   @IsEnum(['ADMIN', 'USER', 'EMPLOYEE'], {
     message: 'Valid role required',

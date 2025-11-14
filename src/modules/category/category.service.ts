@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateCategoryDto } from './dtos/create-category.dto';
 import { UpdateCategoryDto } from './dtos/update-category.dto';
@@ -8,17 +8,38 @@ import { Repository } from 'typeorm';
 @Injectable()
 export class CategoryService {
   constructor(@InjectRepository(Category) private categoryRepository: Repository<Category>) {}
+
+  private async existingCategory(name: string) {
+    const category = await this.categoryRepository
+      .createQueryBuilder('category')
+      .where("category.name = :name", { name })
+      .getOne()
+    return category;
+  }
   async create(createCategoryDto: CreateCategoryDto[]) {
     try {
+      // check for existing categories by name to avoid duplicates
+      for (const c of createCategoryDto) {
+        const exists = await this.existingCategory(c.name);
+        if (exists) {
+          return {
+            message: `Category with name ${c.name} already exists`
+          }
+        }
+      }
+
+      console.log('OK1');
       await this.categoryRepository
         .createQueryBuilder()
         .insert()
-        .into('category')
+        .into(Category)
         .values(createCategoryDto)
         .execute()
-        return {
-          message: "Category created successfully!"
-        }
+      
+        console.log('OK2');
+      return {
+        message: "Category created successfully!"
+      }
     } catch (error) {
       return {
         message: "Fail to create category!"
@@ -38,9 +59,7 @@ export class CategoryService {
       .getOne()
     console.log(`Inside findOne function of category.service.`)
     if(result === null) {
-      return {
-        message: 'Cannot find category required. Please go back!'
-      }
+      throw new NotFoundException('Category not found');
     }
     return result;
   }
@@ -55,9 +74,7 @@ export class CategoryService {
       .execute()
       return `Category with ID ${id} has been updated successfully!`;
     } catch (error) {
-      return {
-        error: error
-      }
+      throw new NotFoundException('Category not found');
     }
   }
 
@@ -69,9 +86,7 @@ export class CategoryService {
       .where("category.id = :id", { id })
       .getOne()
       if(result === null) {
-        return {
-          message: `Category with ID ${id} cannot be found or has already been deleted`
-        }
+        throw new NotFoundException('Category not found')
       }
       await this.categoryRepository
         .createQueryBuilder()
@@ -81,9 +96,7 @@ export class CategoryService {
         .execute()
       return `Category with ID ${id} has been deleted successfully!`;
     } catch (error) {
-      return {
-        error: error
-      }
+      throw new NotFoundException('Category not found');
     }
   }
 }

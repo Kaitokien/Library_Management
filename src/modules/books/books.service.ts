@@ -9,6 +9,7 @@ import { Rental, RentalStatus } from 'src/modules/rental/entity/rental.entity';
 import { RentalBook, RentalBookStatus } from 'src/modules/rental/entity/rental_book.entity';
 import { Users } from 'src/modules/users/entity/user.entity';
 import { Repository, DataSource } from 'typeorm';
+import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
 
 @Injectable()
 export class BooksService {
@@ -18,6 +19,14 @@ export class BooksService {
   ) {}
   async create(createBookDto: CreateBookDto[]) {
     try {
+      const existingBooks = await this.bookRepository
+        .createQueryBuilder('books')
+        .where('books.isbn = :isbn', { isbn: createBookDto[0].isbn })
+        .getOne();
+      console.log(existingBooks)
+      if (existingBooks) {
+        return(`Book with ISBN ${existingBooks.isbn} already exists.`);
+      }
       await this.bookRepository
         .createQueryBuilder()
         .insert()

@@ -55,7 +55,8 @@ export class RentalService {
     return await this.datasource.transaction(async manager => {
 
       // Kiem tra xem nguoi dung co ton tai hay khong
-      const user = this.findUser(id);
+      const user = await this.findUser(id);
+
       if (!user) throw new NotFoundException('User not found');
 
       console.log(`Inside Update Status of employee side`)
@@ -359,7 +360,7 @@ export class RentalService {
         throw new BadRequestException('This rental book has already been returned');
       }
       else if(rental_book.status === RentalBookStatus.PROGRESSING) {
-        throw new BadRequestException('This rental book is not payed');
+        throw new BadRequestException('This rental book is not paid');
       }
 
       // Update rentalbook status and book stock

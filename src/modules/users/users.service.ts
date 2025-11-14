@@ -38,7 +38,7 @@ export class UsersService {
     if (updateUserDto.email) {
       const existing = await this.userRepository.findOneBy({ email: updateUserDto.email })
       if (existing && existing.id !== id) {
-        return { message: 'This email exists. Please choose another appropriate one!' }
+        throw new Error('This email exists. Please choose another appropriate one!')
       }
     }
     await this.userRepository

@@ -9,7 +9,6 @@ import { UserRole } from "src/modules/users/entity/user.entity";
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 
 @ApiTags('Authentication')
-@ApiBearerAuth()
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -26,13 +25,20 @@ export class AuthController {
   @ApiOperation({ summary: 'API để đăng nhập tài khoản' })
   @ApiBody({ type: LoginDto })
   @ApiResponse({ status: 201, description: 'Login successfully' })
+  @ApiResponse({ status: 401, description: 'Invalid credentials' })
+  @ApiResponse({ status: 404, description: 'User not found' })
   @Post('login')
   login(@Body() loginDto: LoginDto) {
     console.log(`Inside /auth/login. The data is ${loginDto}`)
     return this.authService.login(loginDto);
   }
 
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'API để tạo tài khoản nhân viên (chỉ quản trị viên truy cập được)' })
+  @ApiBody({ schema: { example: { username: 'Bruce Wayne', email: 'brucewayne@example.com', password: '123', role: 'EMPLOYEE' } } })
+  @ApiResponse({ status: 201, description: 'Employee created successfully' })
+  @ApiResponse({ status: 409, description: 'Email or username already exists' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @Post('create-employee')

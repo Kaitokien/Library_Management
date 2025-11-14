@@ -30,9 +30,7 @@ export class AuthService {
       throw new ConflictException('Email or username already exists');
     }
     if(createUserDto.role === 'EMPLOYEE') {
-      return {
-        message: "You are not authorized to create an Employee. Please contact the Admin for details!"
-      }
+      throw new UnauthorizedException('You are not authorized to create an Employee. Please contact the Admin for details!');
     }
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     const new_user = this.userRepository.create({
@@ -63,9 +61,7 @@ export class AuthService {
     const isValid = await bcrypt.compare(password, user.password);
 
     if (!isValid) {
-      return {
-        message: "Sai email hoac mat khau!"
-      }
+      throw new UnauthorizedException('Invalid credentials');
     }
 
     const payload = { 
@@ -87,9 +83,7 @@ export class AuthService {
       throw new ConflictException('Email or username already exists');
     }
     if(createEmployee.role !== 'EMPLOYEE') {
-      return {
-        message: 'Please create an Employee!'
-      }
+      throw new UnauthorizedException('Only employees can be created!');
     }
     const hashedPassword = await bcrypt.hash(createEmployee.password, 10);
     const new_user = this.userRepository.create({
